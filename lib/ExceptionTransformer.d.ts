@@ -1,11 +1,9 @@
-import {
-  CustomTransformers,
-  Exception,
-  ExceptionMap
-} from "./ExceptionTransformerModel";
+import { CustomTransformers, Exception, ExceptionMap, Options } from "./ExceptionTransformerModel";
 declare class ExceptionTransformer {
-  private readonly customTransformers?;
-  constructor(customTransformers?: CustomTransformers);
-  generateExceptionMap(exception: Exception): ExceptionMap;
+    private readonly customTransformers?;
+    constructor(customTransformers?: CustomTransformers);
+    generateExceptionMap(exception: Exception): ExceptionMap;
+    generateSpesificFieldError(errorInfo: Exception | null | undefined): (fieldName: string) => any;
+    generateErrorMessage(errorInfo: Exception, options?: Options): string;
 }
 export default ExceptionTransformer;

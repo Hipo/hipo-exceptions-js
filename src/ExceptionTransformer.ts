@@ -2,8 +2,10 @@ import { createMapFromObject } from "./utils/mapUtils";
 import {
   CustomTransformers,
   Exception,
-  ExceptionMap
+  ExceptionMap,
+  Options
 } from "./ExceptionTransformerModel";
+import { GENERIC_ERROR_MESSAGE } from "./utils/errorConstants";
 
 class ExceptionTransformer {
   private readonly customTransformers?: CustomTransformers;
@@ -46,8 +48,79 @@ class ExceptionTransformer {
         exception.fallback_message
       );
     }
-
     return exceptionMap;
+  }
+
+  public generateSpesificFieldError(errorInfo: Exception | null | undefined) {
+    const detail =
+      errorInfo && typeof errorInfo.detail === "object" && errorInfo.detail;
+
+    if (detail) {
+      return function getError(fieldName: string) {
+        return detail[fieldName];
+      };
+    } else {
+      return () => {};
+    }
+  }
+
+  public generateErrorMessage(
+    errorInfo: Exception,
+    options: Options = {}
+  ): string {
+    let finalMessage = "";
+    const { knownErrorKeys = [], skipTypes = [] } = options;
+
+    try {
+      if (!(skipTypes && skipTypes.includes(errorInfo.type))) {
+        const errorDetail = errorInfo.detail;
+        let shouldDisplayFallbackMessage = false;
+        let message = "";
+
+        if (errorDetail && typeof errorDetail === "object") {
+          const errorDetailKeys = Object.keys(errorDetail);
+
+          if (
+            errorDetailKeys.includes("non_field_errors") &&
+            errorDetail.non_field_errors
+          ) {
+            if (typeof errorDetail.non_field_errors[0] === "string") {
+              message = errorDetail.non_field_errors[0];
+            } else {
+              shouldDisplayFallbackMessage = true;
+            }
+          } else {
+            const unknownErrorKeys = errorDetailKeys.filter(errorKey => {
+              return !(knownErrorKeys || []).includes(errorKey);
+            });
+
+            if (unknownErrorKeys.length) {
+              message = `${unknownErrorKeys[0]}: ${
+                errorDetail[unknownErrorKeys[0]]
+              }`;
+            }
+          }
+        } else {
+          shouldDisplayFallbackMessage = true;
+        }
+
+        if (shouldDisplayFallbackMessage) {
+          message = errorInfo.fallback_message
+            ? errorInfo.fallback_message
+            : GENERIC_ERROR_MESSAGE;
+        }
+
+        finalMessage = message;
+      }
+    } catch (error) {
+      console.error(
+        "Unknown error shape passed to ExceptionTransformer",
+        error
+      );
+      finalMessage = GENERIC_ERROR_MESSAGE;
+    }
+
+    return finalMessage;
   }
 }
 
