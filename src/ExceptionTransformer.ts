@@ -1,14 +1,15 @@
 import { createMapFromObject } from "./utils/mapUtils";
+import { getErrorDetail } from "./utils/errorUtils";
 import {
   CustomTransformers,
   Exception,
   ExceptionMap,
   Options
 } from "./ExceptionTransformerModel";
-import { GENERIC_ERROR_MESSAGE } from "./utils/errorConstants";
 
 class ExceptionTransformer {
   private readonly customTransformers?: CustomTransformers;
+  private readonly genericErrorMessage: string;
 
   // Initialize the custom exception transformers to the instance
   // If you need to handle custom logic according to exception.type, here is an example;
@@ -22,10 +23,14 @@ class ExceptionTransformer {
   //   },
   //   ...
   // };
-  public constructor(customTransformers?: CustomTransformers) {
+  public constructor(
+    genericErrorMessage: string,
+    customTransformers?: CustomTransformers
+  ) {
     if (customTransformers) {
       this.customTransformers = customTransformers;
     }
+    this.genericErrorMessage = genericErrorMessage;
   }
 
   // Generates a Map from the exception object that came from API
@@ -52,16 +57,15 @@ class ExceptionTransformer {
   }
 
   public generateSpesificFieldError(errorInfo: Exception | null | undefined) {
-    const detail =
-      errorInfo && typeof errorInfo.detail === "object" && errorInfo.detail;
+    const errorDetail = getErrorDetail(errorInfo);
 
-    if (detail) {
+    if (errorDetail) {
       return function getError(fieldName: string) {
-        return detail[fieldName];
+        return errorDetail[fieldName];
       };
-    } else {
-      return () => {};
     }
+
+    return () => undefined;
   }
 
   public generateErrorMessage(
@@ -70,14 +74,15 @@ class ExceptionTransformer {
   ): string {
     let finalMessage = "";
     const { knownErrorKeys = [], skipTypes = [] } = options;
+    const shouldSkipError = skipTypes && skipTypes.includes(errorInfo.type);
 
     try {
-      if (!(skipTypes && skipTypes.includes(errorInfo.type))) {
-        const errorDetail = errorInfo.detail;
+      if (!shouldSkipError) {
+        const errorDetail = getErrorDetail(errorInfo);
         let shouldDisplayFallbackMessage = false;
         let message = "";
 
-        if (errorDetail && typeof errorDetail === "object") {
+        if (errorDetail) {
           const errorDetailKeys = Object.keys(errorDetail);
 
           if (
@@ -105,9 +110,7 @@ class ExceptionTransformer {
         }
 
         if (shouldDisplayFallbackMessage) {
-          message = errorInfo.fallback_message
-            ? errorInfo.fallback_message
-            : GENERIC_ERROR_MESSAGE;
+          message = errorInfo.fallback_message || this.genericErrorMessage;
         }
 
         finalMessage = message;
@@ -117,7 +120,7 @@ class ExceptionTransformer {
         "Unknown error shape passed to ExceptionTransformer",
         error
       );
-      finalMessage = GENERIC_ERROR_MESSAGE;
+      finalMessage = this.genericErrorMessage;
     }
 
     return finalMessage;

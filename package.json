@@ -1,6 +1,6 @@
 {
   "name": "hipo-exception-transformer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "JavaScript client for parsing the hipo-drf-exceptions",
   "main": "lib/index.js",
   "scripts": {
