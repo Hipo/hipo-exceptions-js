@@ -163,10 +163,10 @@ const exampleFour = {
 ---
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleFour);
 
-exceptionTransformer.getFieldError("message") // <- Returns { body: ["Message body is missing"], attachment: ["Attachment is missing"] } So Do not use this one for that purpose.
-exceptionTransformer.getFieldError("message.attachment") // ["Attachment is missing"]
-exceptionTransformer.getFieldError("summary.info") // undefined
-exceptionTransformer.getFieldError("password") // ["Password is too short",  "Please use only letters and numbers"]
+getFieldError("message") // <- Returns { body: ["Message body is missing"], attachment: ["Attachment is missing"] } So Do not use this one for that purpose.
+getFieldError("message.attachment") // ["Attachment is missing"]
+getFieldError("summary.info") // undefined
+getFieldError("password") // ["Password is too short",  "Please use only letters and numbers"]
 
 exceptionTransformer.generateErrorMessage(exampleFour, {knownErrorKeys: ["password", "message.body"]}) // "attachment: Attachment is missing"
  ```
@@ -190,8 +190,8 @@ const exampleFive = {
 ---
 const getFieldError = exceptionTransformergenerateSpecificFieldError(exampleFive);
 
-exceptionTransformer.getFieldError("message") /// <- Returns { non_field_errors: ["Attachments or body must be provided."], title: ["Message title is missing"] } So Do not use this one for that purpose.
-exceptionTransformer.getFieldError("message.title") // ["Message title is missing"]
+getFieldError("message") /// <- Returns { non_field_errors: ["Attachments or body must be provided."], title: ["Message title is missing"] } So Do not use this one for that purpose.
+getFieldError("message.title") // ["Message title is missing"]
 
 exceptionTransformer.generateErrorMessage(exampleFive) // "summary: Summary is missing"
 exceptionTransformer.generateErrorMessage(exampleFive, {knownErrorKeys: ["summary", "message.title"]}) // "Attachments or body must be provided."
@@ -239,7 +239,7 @@ exceptionTransformer.generateErrorMessage({
 
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleSix);
 
-exceptionTransformer.getFieldError("questions"); /// <- Returns [{}, {}, {}, {answer: ["required"]}, {}]. So Do not use this one for that purpose.
+getFieldError("questions"); /// <- Returns [{}, {}, {}, {answer: ["required"]}, {}]. So Do not use this one for that purpose.
 
 exceptionTransformer.generateErrorMessage({
  type: "CustomMessageError",
@@ -266,7 +266,7 @@ const exampleSeven = {
 ---
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleSeven);
 
-exceptionTransformer.getFieldError("questions") // undefined
+getFieldError("questions") // undefined
 
 exceptionTransformer.generateErrorMessage(exampleSeven, {knownErrorKeys: ["questions"]}) // GENERIC_ERROR_MESSAGE since `detail` and `fallback_message` are empty 
 ```
@@ -283,7 +283,7 @@ const exampleEight = {};
 ---
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleEight);
 
-exceptionTransformer.getFieldError("questions") // undefined
+getFieldError("questions") // undefined
 
 exceptionTransformer.generateErrorMessage(exampleEight, {knownErrorKeys: ["questions"]}) // GENERIC_ERROR_MESSAGE since error is an empty object
 ```
@@ -304,7 +304,7 @@ const exampleNine = {
 ---
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleNine);
 
-exceptionTransformer.getFieldError("questions") // []
+getFieldError("questions") // []
 
 exceptionTransformer.generateErrorMessage(exampleNine) // "questions: undefined"
 ```
