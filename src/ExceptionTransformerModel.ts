@@ -1,8 +1,7 @@
 type ExceptionMap = Map<string, object>;
 
 interface ExceptionDetail {
-  non_field_errors?: string[];
-  [x: string]: undefined | any;
+  [x: string]: string[];
 }
 
 interface CustomTransformers {

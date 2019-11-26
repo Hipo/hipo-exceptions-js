@@ -1,5 +1,11 @@
 import { createMapFromObject } from "./utils/mapUtils";
-import { getErrorDetail } from "./utils/errorUtils";
+import {
+  getErrorDetail,
+  isObjectEmpty,
+  getErrorDetailMessage,
+  deleteProperty,
+  getValueFromPath
+} from "./utils/errorUtils";
 import {
   CustomTransformers,
   Exception,
@@ -7,9 +13,21 @@ import {
   Options
 } from "./ExceptionTransformerModel";
 
+interface ExceptionTransformerConfig {
+  customTransformers?: CustomTransformers;
+  onUnexpectedException?: (details: {
+    error: any;
+    errorInfo: Exception;
+  }) => void;
+}
+
 class ExceptionTransformer {
   private readonly customTransformers?: CustomTransformers;
   private readonly genericErrorMessage: string;
+  private readonly onUnexpectedException?: (details: {
+    error: any;
+    errorInfo: Exception;
+  }) => void;
 
   // Initialize the custom exception transformers to the instance
   // If you need to handle custom logic according to exception.type, here is an example;
@@ -25,10 +43,14 @@ class ExceptionTransformer {
   // };
   public constructor(
     genericErrorMessage: string,
-    customTransformers?: CustomTransformers
+    config?: ExceptionTransformerConfig
   ) {
-    if (customTransformers) {
-      this.customTransformers = customTransformers;
+    if (config && config.customTransformers) {
+      this.customTransformers = config.customTransformers;
+    }
+
+    if (config && config.onUnexpectedException) {
+      this.onUnexpectedException = config.onUnexpectedException;
     }
     this.genericErrorMessage = genericErrorMessage;
   }
@@ -56,70 +78,88 @@ class ExceptionTransformer {
     return exceptionMap;
   }
 
-  public generateSpesificFieldError(errorInfo: Exception | null | undefined) {
+  // Returns `getError` function, which returns the field error if there is errorDetail.
+  // Otherwise returns () => undefined
+  //
+  // `getError` function returns value of given key if `fieldName` is string
+  // `fieldName` can be "message.title.name" and this function can through
+  // errorInfo = {
+  //   message: {
+  //     title: {
+  //       name: ["a logical message"];
+  //     }
+  //   }
+  // }
+  // and return `["a logical message"]`
+  //
+  // No handling if value of the `fieldName` is not string[]
+  public generateSpecificFieldError(
+    errorInfo: Exception | null | undefined
+  ): (fieldName: string) => string[] | undefined {
     const errorDetail = getErrorDetail(errorInfo);
 
     if (errorDetail) {
       return function getError(fieldName: string) {
-        return errorDetail[fieldName];
+        // fieldName can be string only
+        return typeof fieldName === "string"
+          ? getValueFromPath(errorDetail, fieldName)
+          : undefined;
       };
     }
 
     return () => undefined;
   }
 
+  // Generates a printable error message.
+  // `skipTypes` array can be given to skip errors with given types.
+  // `knownErrorKeys` array can be given to skip errors with given keys.
+  // If all error keys in errorInfo.detail is known (is in `knownErrorKeys`) or errorInfo.type should skipped, an empty string is returned as message.
+  // If there is a `non_field_errors` key in error detail, its first meaningful string message is returned.
+  // If there is no `non_field_errors`, first unknown key's key and value is combined as a message.
+  // If no meaningful message is generated using methods above, `fallback_message` is used as message.
+  // If there is no `fallback_message`, `genericErrorMessage` will return as message.
   public generateErrorMessage(
     errorInfo: Exception,
     options: Options = {}
   ): string {
-    let finalMessage = "";
     const { knownErrorKeys = [], skipTypes = [] } = options;
     const shouldSkipError = skipTypes && skipTypes.includes(errorInfo.type);
+    let finalMessage = "";
 
     try {
       if (!shouldSkipError) {
-        const errorDetail = getErrorDetail(errorInfo);
+        let errorDetail = getErrorDetail(errorInfo);
         let shouldDisplayFallbackMessage = false;
         let message = "";
 
-        if (errorDetail) {
-          const errorDetailKeys = Object.keys(errorDetail);
-
-          if (
-            errorDetailKeys.includes("non_field_errors") &&
-            errorDetail.non_field_errors
-          ) {
-            if (typeof errorDetail.non_field_errors[0] === "string") {
-              message = errorDetail.non_field_errors[0];
-            } else {
-              shouldDisplayFallbackMessage = true;
-            }
-          } else {
-            const unknownErrorKeys = errorDetailKeys.filter(errorKey => {
-              return !(knownErrorKeys || []).includes(errorKey);
-            });
-
-            if (unknownErrorKeys.length) {
-              message = `${unknownErrorKeys[0]}: ${
-                errorDetail[unknownErrorKeys[0]]
-              }`;
-            }
+        if (errorDetail && !isObjectEmpty(errorDetail)) {
+          if (knownErrorKeys && knownErrorKeys.length) {
+            errorDetail = knownErrorKeys.reduce((object, errorKey) => {
+              // delete all `knownErrorKeys` from errorDetail
+              return deleteProperty(object, errorKey);
+            }, errorDetail);
           }
+          message = getErrorDetailMessage(errorDetail);
         } else {
           shouldDisplayFallbackMessage = true;
         }
 
         if (shouldDisplayFallbackMessage) {
           message = errorInfo.fallback_message || this.genericErrorMessage;
+          // log this if `onUnexpectedException` is provided
+          this.onUnexpectedException &&
+            this.onUnexpectedException({
+              error: "FALLED_TO_FALLBACK",
+              errorInfo
+            });
         }
 
         finalMessage = message;
       }
     } catch (error) {
-      console.error(
-        "Unknown error shape passed to ExceptionTransformer",
-        error
-      );
+      // log this if `onUnexpectedException` is provided
+      this.onUnexpectedException &&
+        this.onUnexpectedException({ error, errorInfo });
       finalMessage = this.genericErrorMessage;
     }
 

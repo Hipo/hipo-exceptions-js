@@ -1,5 +1,5 @@
 {
-  "name": "hipo-exception-transformer",
+  "name": "hipo-exceptions-js",
   "version": "1.0.0",
   "description": "JavaScript client for parsing the hipo-drf-exceptions",
   "main": "lib/index.js",
