@@ -1,7 +1,7 @@
 type ExceptionMap = Map<string, object>;
 
 interface ExceptionDetail {
-  [x: string]: string[];
+  [key: string]: string[] | ExceptionDetail | ExceptionDetail[];
 }
 
 interface CustomTransformers {

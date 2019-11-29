@@ -1,6 +1,6 @@
 declare type ExceptionMap = Map<string, object>;
 interface ExceptionDetail {
-    [x: string]: string[];
+    [key: string]: string[] | ExceptionDetail | ExceptionDetail[];
 }
 interface CustomTransformers {
     [type: string]: (params: Exception) => ExceptionMap;
