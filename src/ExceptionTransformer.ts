@@ -92,10 +92,10 @@ class ExceptionTransformer {
     errorInfo: Exception | null | undefined
   ): (fieldName: string) => string[] | undefined {
     const errorDetail = getErrorDetail(errorInfo);
-    let fieldError: string[] | undefined;
 
     if (errorDetail) {
       return function getError(fieldName: string) {
+        let fieldError: string[] | undefined;
         //fieldName can be string only
         if (typeof fieldName === "string") {
           const errorValue = getValueFromPath(errorDetail, fieldName);
