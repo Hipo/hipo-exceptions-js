@@ -1,7 +1,7 @@
 type ExceptionMap = Map<string, object>;
 
 interface ExceptionDetail {
-  [fieldName: string]: object;
+  [key: string]: string[] | ExceptionDetail | ExceptionDetail[];
 }
 
 interface CustomTransformers {
@@ -14,4 +14,22 @@ interface Exception {
   fallback_message: string;
 }
 
-export { ExceptionMap, CustomTransformers, ExceptionDetail, Exception };
+type Options = {
+  knownErrorKeys?: string[] | null;
+  skipTypes?: string[];
+};
+
+type OnUnexpectedException = (details: {
+  type: string;
+  error: any;
+  errorInfo: Exception;
+}) => void;
+
+export {
+  ExceptionMap,
+  CustomTransformers,
+  ExceptionDetail,
+  Exception,
+  Options,
+  OnUnexpectedException
+};
