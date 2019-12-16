@@ -3,34 +3,26 @@ import {
   getErrorDetail,
   isObjectEmpty,
   getStringMessage,
-  deleteProperty,
-  getValueFromPath,
-  isArrayOfString
+  removeKnownKeysFromErrorDetail,
+  generateFieldErrorFromErrorDetail
 } from "./utils/errorUtils";
 import {
   CustomTransformers,
   Exception,
   ExceptionMap,
   Options,
-  ExceptionDetail
+  OnUnexpectedException
 } from "./ExceptionTransformerModel";
 
 interface ExceptionTransformerConfig {
   customTransformers?: CustomTransformers;
-  onUnexpectedException?: (details: {
-    error: any;
-    errorInfo: Exception;
-  }) => void;
+  onUnexpectedException?: OnUnexpectedException;
 }
 
 class ExceptionTransformer {
   private readonly customTransformers?: CustomTransformers;
-  private readonly genericErrorMessage: string;
-  private readonly onUnexpectedException?: (details: {
-    type: string;
-    error: any;
-    errorInfo: Exception;
-  }) => void;
+  private genericErrorMessage: string;
+  private readonly onUnexpectedException?: OnUnexpectedException;
 
   constructor(
     genericErrorMessage: string,
@@ -46,6 +38,10 @@ class ExceptionTransformer {
       }
     }
     this.genericErrorMessage = genericErrorMessage;
+  }
+
+  changeGenericErrorMessage(newMessage: string) {
+    this.genericErrorMessage = newMessage;
   }
 
   // Generates a Map from the exception object that came from API
@@ -71,10 +67,10 @@ class ExceptionTransformer {
     return exceptionMap;
   }
 
-  /*  Returns `getError` function, which returns the field error if there is errorDetail.
+  /*  Returns `errorGenerator` function, which returns the field error if there is errorDetail.
       Otherwise returns () => undefined
       
-      `getError` function returns value of given key if `fieldName` is string
+      `errorGenerator` function returns value of given key if `fieldName` is string
       `fieldName` can be "message.title.name" and this function can through
       errorInfo = {
         message: {
@@ -93,26 +89,20 @@ class ExceptionTransformer {
   ): (fieldName: string) => string[] | undefined {
     const errorDetail = getErrorDetail(errorInfo);
 
-    if (errorDetail) {
-      return function getError(fieldName: string) {
-        let fieldError: string[] | undefined;
-        //fieldName can be string only
-        if (typeof fieldName === "string") {
-          const errorValue = getValueFromPath(errorDetail, fieldName);
-
-          // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
-          if (errorValue) {
-            if (isArrayOfString(errorValue)) {
-              fieldError = errorValue as string[];
-            } else {
-              fieldError = getStringMessage(errorValue)
-                ? [getStringMessage(errorValue)]
-                : undefined;
-            }
-          }
-        }
-        return fieldError;
-      };
+    try {
+      if (errorDetail) {
+        return function errorGenerator(fieldName: string) {
+          return generateFieldErrorFromErrorDetail(fieldName, errorDetail);
+        };
+      }
+    } catch (error) {
+      if (this.onUnexpectedException) {
+        this.onUnexpectedException({
+          type: "CAUGHT_ERROR_WHEN_GENERATING_FIELD_ERROR_MESSAGE",
+          error,
+          errorInfo: errorInfo!
+        });
+      }
     }
 
     if (errorInfo && this.onUnexpectedException) {
@@ -145,22 +135,13 @@ class ExceptionTransformer {
     try {
       if (!shouldSkipError) {
         let errorDetail = getErrorDetail(errorInfo);
-        let shouldDisplayFallbackMessage = false;
         let message = "";
 
         if (errorDetail && !isObjectEmpty(errorDetail)) {
-          if (knownErrorKeys && knownErrorKeys.length) {
-            errorDetail = knownErrorKeys.reduce((object, errorKey) => {
-              // delete all `knownErrorKeys` from errorDetail
-              return deleteProperty(object, errorKey);
-            }, errorDetail);
-          }
-          message = getStringMessage(errorDetail);
+          message = getStringMessage(
+            removeKnownKeysFromErrorDetail(errorDetail, knownErrorKeys)
+          );
         } else {
-          shouldDisplayFallbackMessage = true;
-        }
-
-        if (shouldDisplayFallbackMessage) {
           message = errorInfo.fallback_message || this.genericErrorMessage;
 
           // call `onUnexpectedException` if it fell to the fallback message
@@ -179,7 +160,7 @@ class ExceptionTransformer {
       // log this if `onUnexpectedException` is provided
       if (this.onUnexpectedException) {
         this.onUnexpectedException({
-          type: "CAUGHT_ERROR",
+          type: "CAUGHT_ERROR_WHEN_GENERATING_ERROR_MESSAGE",
           error,
           errorInfo
         });

@@ -14,4 +14,9 @@ declare type Options = {
     knownErrorKeys?: string[] | null;
     skipTypes?: string[];
 };
-export { ExceptionMap, CustomTransformers, ExceptionDetail, Exception, Options };
+declare type OnUnexpectedException = (details: {
+    type: string;
+    error: any;
+    errorInfo: Exception;
+}) => void;
+export { ExceptionMap, CustomTransformers, ExceptionDetail, Exception, Options, OnUnexpectedException };

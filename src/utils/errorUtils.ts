@@ -1,15 +1,25 @@
-import {Exception, ExceptionDetail} from "../ExceptionTransformerModel";
+import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
 
-function getErrorDetail(errorInfo: Exception | null | undefined): ExceptionDetail | null {
-  return errorInfo && typeof errorInfo.detail === "object" ? errorInfo.detail : null;
+function getErrorDetail(
+  errorInfo: Exception | null | undefined
+): ExceptionDetail | null {
+  return errorInfo && typeof errorInfo.detail === "object"
+    ? errorInfo.detail
+    : null;
 }
 
 function isArrayOfString(x: unknown): boolean {
-  return Array.isArray(x) && x.every((item) => Boolean(item && typeof item === "string"));
+  return (
+    Array.isArray(x) &&
+    x.every(item => Boolean(item && typeof item === "string"))
+  );
 }
 
 function isArrayOfObject(x: unknown): boolean {
-  return Array.isArray(x) && x.every((item) => Boolean(item && typeof item === "object"));
+  return (
+    Array.isArray(x) &&
+    x.every(item => Boolean(item && typeof item === "object"))
+  );
 }
 
 function isObjectEmpty(obj: unknown): boolean {
@@ -22,6 +32,30 @@ function generateMessageFromStringArray(array: string[], key?: string): string {
   return key ? `${key}: ${message}` : message;
 }
 
+function generateFieldErrorFromErrorDetail(
+  fieldName: string,
+  errorDetail: ExceptionDetail
+) {
+  let fieldError: string[] | undefined;
+  //fieldName can be string only
+  if (typeof fieldName === "string") {
+    const errorValue = getValueFromPath(errorDetail, fieldName);
+
+    // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
+    if (errorValue) {
+      if (isArrayOfString(errorValue)) {
+        fieldError = errorValue as string[];
+      } else {
+        fieldError = getStringMessage(errorValue)
+          ? [getStringMessage(errorValue)]
+          : undefined;
+      }
+    }
+  }
+
+  return fieldError;
+}
+
 function getStringMessage(
   errorDetailValue: string[] | ExceptionDetail[] | ExceptionDetail,
   key?: string
@@ -31,13 +65,14 @@ function getStringMessage(
   if (Array.isArray(errorDetailValue)) {
     if (isArrayOfString(errorDetailValue)) {
       // errorDetailValue = ["", ""]
-
-      message = generateMessageFromStringArray(errorDetailValue as string[], key);
+      message = generateMessageFromStringArray(
+        errorDetailValue as string[],
+        key
+      );
     } else if (isArrayOfObject(errorDetailValue)) {
-      // errorDetailValue = [ {}, {}, {..} ] array of objects
-
+      // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
-        (x) => !isObjectEmpty(x)
+        x => !isObjectEmpty(x)
       );
 
       if (firstNonEmptyErrorObject) {
@@ -72,7 +107,7 @@ function getStringMessage(
 }
 
 function deleteProperty(exceptionDetail: ExceptionDetail, path: string) {
-  const filteredObj = {...exceptionDetail};
+  const filteredObj = { ...exceptionDetail };
   const keys = path.split(".");
 
   keys.reduce<undefined | string[] | ExceptionDetail | ExceptionDetail[]>(
@@ -91,16 +126,27 @@ function deleteProperty(exceptionDetail: ExceptionDetail, path: string) {
   return filteredObj;
 }
 
+function removeKnownKeysFromErrorDetail(
+  errorDetail: ExceptionDetail,
+  knownErrorKeys: string[] | null
+): ExceptionDetail {
+  if (knownErrorKeys && knownErrorKeys.length) {
+    // delete all `knownErrorKeys` from errorDetail
+    errorDetail = knownErrorKeys.reduce(deleteProperty, errorDetail);
+  }
+
+  return errorDetail;
+}
+
 function getValueFromPath(exceptionDetail: ExceptionDetail, path: string) {
-  const filteredObj = {...exceptionDetail};
+  const filteredObj = { ...exceptionDetail };
   const keys = path.split(".");
 
-  return keys.reduce<undefined | string[] | ExceptionDetail | ExceptionDetail[]>(
-    (acc, key) => {
-      return acc && !Array.isArray(acc) ? acc[key] : undefined;
-    },
-    filteredObj
-  );
+  return keys.reduce<
+    undefined | string[] | ExceptionDetail | ExceptionDetail[]
+  >((acc, key) => {
+    return acc && !Array.isArray(acc) ? acc[key] : undefined;
+  }, filteredObj);
 }
 
 export {
@@ -108,7 +154,9 @@ export {
   isArrayOfString,
   isObjectEmpty,
   generateMessageFromStringArray,
+  generateFieldErrorFromErrorDetail,
   getStringMessage,
   deleteProperty,
+  removeKnownKeysFromErrorDetail,
   getValueFromPath
 };

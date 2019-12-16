@@ -19,10 +19,17 @@ type Options = {
   skipTypes?: string[];
 };
 
+type OnUnexpectedException = (details: {
+  type: string;
+  error: any;
+  errorInfo: Exception;
+}) => void;
+
 export {
   ExceptionMap,
   CustomTransformers,
   ExceptionDetail,
   Exception,
-  Options
+  Options,
+  OnUnexpectedException
 };
