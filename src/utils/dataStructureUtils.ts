@@ -1,4 +1,4 @@
-function createMapFromObject<T>(obj: Record<string, T>) {
+function createMapFromObject(obj: Record<string, any>) {
   const map = new Map<string, any>();
 
   for (const key in obj) {
