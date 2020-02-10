@@ -1,7 +1,6 @@
-import { createMapFromObject } from "./utils/mapUtils";
+import { createMapFromObject, isObjectEmpty } from "./utils/dataStructureUtils";
 import {
   getErrorDetail,
-  isObjectEmpty,
   getStringMessage,
   removeKnownKeysFromErrorDetail,
   generateFieldErrorFromErrorDetail

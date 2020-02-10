@@ -1,4 +1,9 @@
 import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
+import {
+  isArrayOfString,
+  isArrayOfObject,
+  isObjectEmpty
+} from "./dataStructureUtils";
 
 function getErrorDetail(
   errorInfo: Exception | null | undefined
@@ -8,26 +13,8 @@ function getErrorDetail(
     : null;
 }
 
-function isArrayOfString(x: unknown): boolean {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "string"))
-  );
-}
-
-function isArrayOfObject(x: unknown): boolean {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "object"))
-  );
-}
-
-function isObjectEmpty(obj: unknown): boolean {
-  return typeof obj === "object" && obj ? Object.keys(obj).length === 0 : false;
-}
-
 function generateMessageFromStringArray(array: string[], key?: string): string {
-  let message = array[0];
+  const message = array[0];
 
   return key ? `${key}: ${message}` : message;
 }
@@ -151,8 +138,6 @@ function getValueFromPath(exceptionDetail: ExceptionDetail, path: string) {
 
 export {
   getErrorDetail,
-  isArrayOfString,
-  isObjectEmpty,
   generateMessageFromStringArray,
   generateFieldErrorFromErrorDetail,
   getStringMessage,
