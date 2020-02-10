@@ -217,13 +217,19 @@ describe("isObjectEmpty", () => {
   it("should return false when given something else than object", () => {
     expect(isObjectEmpty(undefined)).toBe(false);
     expect(isObjectEmpty(null)).toBe(false);
+
     expect(isObjectEmpty(true)).toBe(false);
+
     expect(isObjectEmpty(123)).toBe(false);
     expect(isObjectEmpty(123.003)).toBe(false);
+
     expect(isObjectEmpty("")).toBe(false);
     expect(isObjectEmpty("string")).toBe(false);
-    // expect(isObjectEmpty([])).toBe(false); // TODO: This is failing, we should fix it by refactoring the util
+
+    expect(isObjectEmpty([])).toBe(false);
     expect(isObjectEmpty(["not empty", "array of", "strings"])).toBe(false);
+
+    expect(isObjectEmpty(() => ":)")).toBe(false);
   });
 
   it("should return true when object is empty", () => {

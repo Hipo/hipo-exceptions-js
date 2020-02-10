@@ -23,7 +23,9 @@ function isArrayOfObject(x: unknown): boolean {
 }
 
 function isObjectEmpty(obj: unknown): boolean {
-  return typeof obj === "object" && obj ? Object.keys(obj).length === 0 : false;
+  return typeof obj === "object" && !Array.isArray(obj) && obj
+    ? Object.keys(obj).length === 0
+    : false;
 }
 
 export { createMapFromObject, isArrayOfString, isArrayOfObject, isObjectEmpty };
