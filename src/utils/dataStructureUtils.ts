@@ -1,5 +1,5 @@
-function createMapFromObject<T>(obj: T) {
-  const map = new Map();
+function createMapFromObject<T>(obj: Record<string, T>) {
+  const map = new Map<string, any>();
 
   for (const key in obj) {
     map.set(key, obj[key]);

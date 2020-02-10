@@ -6,7 +6,9 @@
   "scripts": {
     "build": "npm run lint:fix && tsc",
     "lint": "eslint src/*",
-    "lint:fix": "prettier 'src/**/*.ts' --write"
+    "lint:fix": "prettier 'src/**/*.ts' --write",
+    "test": "jest",
+    "test:coverage": "rm -rf coverage/ && jest --coverage"
   },
   "keywords": [
     "hipo-exceptions-js",
@@ -21,12 +23,15 @@
   },
   "homepage": "https://github.com/Hipo/hipo-exceptions-js#readme",
   "devDependencies": {
+    "@types/jest": "25.1.2",
     "@typescript-eslint/eslint-plugin": "2.6.1",
     "@typescript-eslint/parser": "2.6.1",
     "eslint": "6.6.0",
     "eslint-config-prettier": "6.5.0",
     "eslint-plugin-prettier": "3.1.1",
+    "jest": "25.1.0",
     "prettier": "1.19.1",
+    "ts-jest": "25.2.0",
     "typescript": "3.7.2"
   }
 }
