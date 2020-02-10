@@ -133,7 +133,7 @@ class ExceptionTransformer {
 
     try {
       if (!shouldSkipError) {
-        let errorDetail = getErrorDetail(errorInfo);
+        const errorDetail = getErrorDetail(errorInfo);
         let message = "";
 
         if (errorDetail && !isObjectEmpty(errorDetail)) {

@@ -210,9 +210,9 @@ exceptionTransformer.generateErrorMessage({
 <details>
     <summary>exampleSix</summary> 
 
-``` typescript
 A Form that has a bulk creation section. Assume there is a form with an input `Title` and a `Questions` section. 
 
+``` typescript
 const exampleSix = {
     type: "ValidationError",
     detail: {
@@ -254,9 +254,9 @@ exceptionTransformer.generateErrorMessage({
 <details>
     <summary>exampleSeven</summary> 
 
-``` typescript
 A non-complete error message
 
+``` typescript
 const exampleSeven = {
     type: "ValidationError",
     detail: {},
@@ -275,9 +275,9 @@ exceptionTransformer.generateErrorMessage(exampleSeven, {knownErrorKeys: ["quest
 <details>
     <summary>exampleEight</summary> 
 
-``` typescript
 An empty error message
 
+``` typescript
 const exampleEight = {};
 
 ---
