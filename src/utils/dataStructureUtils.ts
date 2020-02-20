@@ -16,10 +16,7 @@ function isArrayOfString(x: unknown): boolean {
 }
 
 function isArrayOfObject(x: unknown): boolean {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "object"))
-  );
+  return Array.isArray(x) && x.every(item => typeof item === "object");
 }
 
 function isObjectEmpty(obj: unknown): boolean {
