@@ -15,7 +15,7 @@ function isArrayOfString(x: unknown): boolean {
   );
 }
 
-function isArrayOfObject(x: unknown): boolean {
+function isArrayOfObjects(x: unknown): boolean {
   return Array.isArray(x) && x.every(item => typeof item === "object");
 }
 
@@ -25,4 +25,9 @@ function isObjectEmpty(obj: unknown): boolean {
     : false;
 }
 
-export { createMapFromObject, isArrayOfString, isArrayOfObject, isObjectEmpty };
+export {
+  createMapFromObject,
+  isArrayOfString,
+  isArrayOfObjects,
+  isObjectEmpty
+};

@@ -1,7 +1,7 @@
 import {
   createMapFromObject,
   isArrayOfString,
-  isArrayOfObject,
+  isArrayOfObjects,
   isObjectEmpty
 } from "../../src/utils/dataStructureUtils";
 
@@ -132,18 +132,18 @@ describe("isArrayOfString", () => {
   });
 });
 
-describe("isArrayOfObject", () => {
+describe("isArrayOfObjects", () => {
   it("should return false when given null or undefined", () => {
-    const undefinedResult = isArrayOfObject(undefined);
-    const nullResult = isArrayOfObject(null);
+    const undefinedResult = isArrayOfObjects(undefined);
+    const nullResult = isArrayOfObjects(null);
 
     expect(undefinedResult).toBe(false);
     expect(nullResult).toBe(false);
   });
 
   it("should return false when given an object", () => {
-    const emptyObjectResult = isArrayOfObject({});
-    const nonEmptyObjectResult = isArrayOfObject({
+    const emptyObjectResult = isArrayOfObjects({});
+    const nonEmptyObjectResult = isArrayOfObjects({
       "key-string": "value-string"
     });
 
@@ -152,9 +152,9 @@ describe("isArrayOfObject", () => {
   });
 
   it("should return true when any given object in the array is empty", () => {
-    const emptyObjectsArrayResult = isArrayOfObject([{}]);
-    const longEmptyObjectsArrayResult = isArrayOfObject([{}, {}, {}, {}]);
-    const oneEmptyObjectInTheArrayResult = isArrayOfObject([
+    const emptyObjectsArrayResult = isArrayOfObjects([{}]);
+    const longEmptyObjectsArrayResult = isArrayOfObjects([{}, {}, {}, {}]);
+    const oneEmptyObjectInTheArrayResult = isArrayOfObjects([
       {
         type: "ValidationError",
         detail: {
@@ -178,10 +178,10 @@ describe("isArrayOfObject", () => {
   });
 
   it("should return true when given array of non empty object(s)", () => {
-    const objectArrayResult = isArrayOfObject([
+    const objectArrayResult = isArrayOfObjects([
       { "key-string-1": "value-string-1" }
     ]);
-    const longObjectArrayResult = isArrayOfObject([
+    const longObjectArrayResult = isArrayOfObjects([
       {
         type: "ValidationError",
         detail: {

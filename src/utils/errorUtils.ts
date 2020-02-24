@@ -1,7 +1,7 @@
 import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
 import {
   isArrayOfString,
-  isArrayOfObject,
+  isArrayOfObjects,
   isObjectEmpty
 } from "./dataStructureUtils";
 
@@ -56,7 +56,7 @@ function getStringMessage(
         errorDetailValue as string[],
         key
       );
-    } else if (isArrayOfObject(errorDetailValue)) {
+    } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
         x => !isObjectEmpty(x)
