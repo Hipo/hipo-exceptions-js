@@ -1,25 +1,19 @@
-function createMapFromObject(obj: Record<string, any>) {
-  const map = new Map<string, any>();
-
-  for (const key in obj) {
-    map.set(key, obj[key]);
-  }
-
-  return map;
+function createMapFromObject(obj: { [key: string]: any }) {
+  return new Map(Object.entries(obj));
 }
 
-function isArrayOfString(x: unknown): boolean {
+function isArrayOfStrings(x: unknown): x is string[] {
   return (
     Array.isArray(x) &&
     x.every(item => Boolean(item && typeof item === "string"))
   );
 }
 
-function isArrayOfObjects(x: unknown): boolean {
+function isArrayOfObjects(x: unknown): x is Array<{ [key: string]: any }> {
   return Array.isArray(x) && x.every(item => typeof item === "object");
 }
 
-function isObjectEmpty(obj: unknown): boolean {
+function isObjectEmpty(obj: unknown): obj is {} {
   return typeof obj === "object" && !Array.isArray(obj) && obj
     ? Object.keys(obj).length === 0
     : false;
@@ -27,7 +21,7 @@ function isObjectEmpty(obj: unknown): boolean {
 
 export {
   createMapFromObject,
-  isArrayOfString,
+  isArrayOfStrings,
   isArrayOfObjects,
   isObjectEmpty
 };

@@ -1,6 +1,6 @@
 import {
   createMapFromObject,
-  isArrayOfString,
+  isArrayOfStrings,
   isArrayOfObjects,
   isObjectEmpty
 } from "../../src/utils/dataStructureUtils";
@@ -93,34 +93,34 @@ describe("createMapFromObject", () => {
   });
 });
 
-describe("isArrayOfString", () => {
+describe("isArrayOfStrings", () => {
   it("should return false when given null or undefined", () => {
-    const undefinedResult = isArrayOfString(undefined);
-    const nullResult = isArrayOfString(null);
+    const undefinedResult = isArrayOfStrings(undefined);
+    const nullResult = isArrayOfStrings(null);
 
     expect(undefinedResult).toBe(false);
     expect(nullResult).toBe(false);
   });
 
   it("should return false when given string", () => {
-    const emptyStringResult = isArrayOfString("");
-    const nonEmptyStringResult = isArrayOfString("not-empty-string");
+    const emptyStringResult = isArrayOfStrings("");
+    const nonEmptyStringResult = isArrayOfStrings("not-empty-string");
 
     expect(emptyStringResult).toBe(false);
     expect(nonEmptyStringResult).toBe(false);
   });
 
   it("should return false when given array of empty string", () => {
-    const emptyStringArrayResult = isArrayOfString([""]);
-    const longEmptyStringArrayResult = isArrayOfString(["", "", "", ""]);
+    const emptyStringArrayResult = isArrayOfStrings([""]);
+    const longEmptyStringArrayResult = isArrayOfStrings(["", "", "", ""]);
 
     expect(emptyStringArrayResult).toBe(false);
     expect(longEmptyStringArrayResult).toBe(false);
   });
 
   it("should return true when given array of non empty string(s)", () => {
-    const stringArrayResult = isArrayOfString(["just 1 string"]);
-    const longStringArrayResult = isArrayOfString([
+    const stringArrayResult = isArrayOfStrings(["just 1 string"]);
+    const longStringArrayResult = isArrayOfStrings([
       "array",
       "with",
       "many, many... What the heck so many",

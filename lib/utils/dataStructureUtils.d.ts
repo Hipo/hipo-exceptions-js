@@ -1,5 +1,9 @@
-declare function createMapFromObject(obj: Record<string, any>): Map<string, any>;
-declare function isArrayOfString(x: unknown): boolean;
-declare function isArrayOfObjects(x: unknown): boolean;
-declare function isObjectEmpty(obj: unknown): boolean;
-export { createMapFromObject, isArrayOfString, isArrayOfObjects, isObjectEmpty };
+declare function createMapFromObject(obj: {
+    [key: string]: any;
+}): Map<string, any>;
+declare function isArrayOfStrings(x: unknown): x is string[];
+declare function isArrayOfObjects(x: unknown): x is Array<{
+    [key: string]: any;
+}>;
+declare function isObjectEmpty(obj: unknown): obj is {};
+export { createMapFromObject, isArrayOfStrings, isArrayOfObjects, isObjectEmpty };

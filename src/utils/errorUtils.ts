@@ -1,6 +1,6 @@
 import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
 import {
-  isArrayOfString,
+  isArrayOfStrings,
   isArrayOfObjects,
   isObjectEmpty
 } from "./dataStructureUtils";
@@ -30,8 +30,8 @@ function generateFieldErrorFromErrorDetail(
 
     // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
     if (errorValue) {
-      if (isArrayOfString(errorValue)) {
-        fieldError = errorValue as string[];
+      if (isArrayOfStrings(errorValue)) {
+        fieldError = errorValue;
       } else {
         fieldError = getStringMessage(errorValue)
           ? [getStringMessage(errorValue)]
@@ -50,12 +50,9 @@ function getStringMessage(
   let message = "";
 
   if (Array.isArray(errorDetailValue)) {
-    if (isArrayOfString(errorDetailValue)) {
+    if (isArrayOfStrings(errorDetailValue)) {
       // errorDetailValue = ["", ""]
-      message = generateMessageFromStringArray(
-        errorDetailValue as string[],
-        key
-      );
+      message = generateMessageFromStringArray(errorDetailValue, key);
     } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
