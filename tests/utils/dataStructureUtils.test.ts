@@ -110,12 +110,12 @@ describe("isArrayOfStrings", () => {
     expect(nonEmptyStringResult).toBe(false);
   });
 
-  it("should return false when given array of empty string", () => {
+  it("should return true when given array of empty string", () => {
     const emptyStringArrayResult = isArrayOfStrings([""]);
     const longEmptyStringArrayResult = isArrayOfStrings(["", "", "", ""]);
 
-    expect(emptyStringArrayResult).toBe(false);
-    expect(longEmptyStringArrayResult).toBe(false);
+    expect(emptyStringArrayResult).toBe(true);
+    expect(longEmptyStringArrayResult).toBe(true);
   });
 
   it("should return true when given array of non empty string(s)", () => {
@@ -210,6 +210,28 @@ describe("isArrayOfObjects", () => {
 
     expect(objectArrayResult).toBe(true);
     expect(longObjectArrayResult).toBe(true);
+  });
+
+  it("should return false when given array of array(s)", () => {
+    const emptyArrayOfArrayResult = isArrayOfObjects([[]]);
+    const emptyArrayOfArraysResult = isArrayOfObjects([[], []]);
+    const notEmptyArrayOfArraysResult = isArrayOfObjects([[1]]);
+    const someEmptyArrayOfArraysResult = isArrayOfObjects([
+      [],
+      ["not", "empty", "array"],
+      []
+    ]);
+    const arrayOfArraysAndObjectsResult = isArrayOfObjects([
+      [],
+      ["not", "empty", "array"],
+      { "object-key": "object-value" }
+    ]);
+
+    expect(emptyArrayOfArrayResult).toBe(false);
+    expect(emptyArrayOfArraysResult).toBe(false);
+    expect(notEmptyArrayOfArraysResult).toBe(false);
+    expect(someEmptyArrayOfArraysResult).toBe(false);
+    expect(arrayOfArraysAndObjectsResult).toBe(false);
   });
 });
 

@@ -3,14 +3,14 @@ function createMapFromObject(obj: { [key: string]: any }) {
 }
 
 function isArrayOfStrings(x: unknown): x is string[] {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "string"))
-  );
+  return Array.isArray(x) && x.every(item => typeof item === "string");
 }
 
 function isArrayOfObjects(x: unknown): x is Array<{ [key: string]: any }> {
-  return Array.isArray(x) && x.every(item => typeof item === "object");
+  return (
+    Array.isArray(x) &&
+    x.every(item => typeof item === "object" && !Array.isArray(item))
+  );
 }
 
 function isObjectEmpty(obj: unknown): obj is {} {
