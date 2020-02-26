@@ -1,7 +1,6 @@
-import { createMapFromObject } from "./utils/mapUtils";
+import { createMapFromObject, isObjectEmpty } from "./utils/dataStructureUtils";
 import {
   getErrorDetail,
-  isObjectEmpty,
   getStringMessage,
   removeKnownKeysFromErrorDetail,
   generateFieldErrorFromErrorDetail
@@ -134,7 +133,7 @@ class ExceptionTransformer {
 
     try {
       if (!shouldSkipError) {
-        let errorDetail = getErrorDetail(errorInfo);
+        const errorDetail = getErrorDetail(errorInfo);
         let message = "";
 
         if (errorDetail && !isObjectEmpty(errorDetail)) {

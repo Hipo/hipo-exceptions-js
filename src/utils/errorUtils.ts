@@ -1,4 +1,9 @@
 import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
+import {
+  isArrayOfStrings,
+  isArrayOfObjects,
+  isObjectEmpty
+} from "./dataStructureUtils";
 
 function getErrorDetail(
   errorInfo: Exception | null | undefined
@@ -8,26 +13,8 @@ function getErrorDetail(
     : null;
 }
 
-function isArrayOfString(x: unknown): boolean {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "string"))
-  );
-}
-
-function isArrayOfObject(x: unknown): boolean {
-  return (
-    Array.isArray(x) &&
-    x.every(item => Boolean(item && typeof item === "object"))
-  );
-}
-
-function isObjectEmpty(obj: unknown): boolean {
-  return typeof obj === "object" && obj ? Object.keys(obj).length === 0 : false;
-}
-
 function generateMessageFromStringArray(array: string[], key?: string): string {
-  let message = array[0];
+  const message = array[0];
 
   return key ? `${key}: ${message}` : message;
 }
@@ -43,8 +30,8 @@ function generateFieldErrorFromErrorDetail(
 
     // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
     if (errorValue) {
-      if (isArrayOfString(errorValue)) {
-        fieldError = errorValue as string[];
+      if (isArrayOfStrings(errorValue)) {
+        fieldError = errorValue;
       } else {
         fieldError = getStringMessage(errorValue)
           ? [getStringMessage(errorValue)]
@@ -63,13 +50,10 @@ function getStringMessage(
   let message = "";
 
   if (Array.isArray(errorDetailValue)) {
-    if (isArrayOfString(errorDetailValue)) {
+    if (isArrayOfStrings(errorDetailValue)) {
       // errorDetailValue = ["", ""]
-      message = generateMessageFromStringArray(
-        errorDetailValue as string[],
-        key
-      );
-    } else if (isArrayOfObject(errorDetailValue)) {
+      message = generateMessageFromStringArray(errorDetailValue, key);
+    } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
         x => !isObjectEmpty(x)
@@ -151,8 +135,6 @@ function getValueFromPath(exceptionDetail: ExceptionDetail, path: string) {
 
 export {
   getErrorDetail,
-  isArrayOfString,
-  isObjectEmpty,
   generateMessageFromStringArray,
   generateFieldErrorFromErrorDetail,
   getStringMessage,
