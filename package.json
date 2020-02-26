@@ -1,8 +1,11 @@
 {
   "name": "@hipo/hipo-exceptions-js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JavaScript client for parsing the hipo-drf-exceptions",
   "main": "lib/index.js",
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
     "build": "npm run lint:fix && tsc",
     "lint": "eslint src/*",
