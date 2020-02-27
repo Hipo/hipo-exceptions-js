@@ -1,8 +1,10 @@
 type ExceptionMap = Map<string, object>;
 
 interface ExceptionDetail {
-  [key: string]: string[] | ExceptionDetail | ExceptionDetail[];
+  [key: string]: ExceptionDetailValue;
 }
+
+type ExceptionDetailValue = string[] | ExceptionDetail | ExceptionDetail[];
 
 interface CustomTransformers {
   [type: string]: (params: Exception) => ExceptionMap;
@@ -31,5 +33,6 @@ export {
   ExceptionDetail,
   Exception,
   Options,
-  OnUnexpectedException
+  OnUnexpectedException,
+  ExceptionDetailValue
 };
