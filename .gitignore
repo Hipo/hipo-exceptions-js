@@ -13,6 +13,3 @@ stats.json
 .DS_Store
 npm-debug.log
 .npm
-
-# We gitignore the `/lib` but whitelist it at files property at package.json
-/lib
