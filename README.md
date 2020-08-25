@@ -5,7 +5,7 @@ JavaScript client for parsing the [hipo-drf-exceptions](https://github.com/Hipo/
 ### exceptionTransformer.generateExceptionMap  
 
 ```typescript      
-import ExceptionTransformer from "hipo-exceptions-js";      
+import ExceptionTransformer from "@hipo/hipo-exceptions-js";      
 
 // Create an `ExceptionTransformer` instance while your app is bootstrapping      
 const exceptionTransformer = new ExceptionTransformer(GENERIC_ERROR_MESSAGE);      
@@ -29,7 +29,7 @@ const signupExceptionMap = exceptionTransformer.generateExceptionMap(
     CustomTransformers,    
     Exception,    
     ExceptionMap    
-  } from "hipo-exceptions-js";     
+  } from "@hipo/hipo-exceptions-js";     
         
   // Define your application's custom exception transformers    
   const customExceptionTransformers: CustomTransformers = {      
@@ -77,7 +77,7 @@ const signupExceptionMap = exceptionTransformer.generateExceptionMap(
   
 ## Examples
 ``` typescript
-import ExceptionTransformer from "hipo-exceptions-js";      
+import ExceptionTransformer from "@hipo/hipo-exceptions-js";      
 
 // Create an `ExceptionTransformer` instance while your app is bootstrapping      
 const exceptionTransformer = new ExceptionTransformer(GENERIC_ERROR_MESSAGE);
@@ -94,6 +94,8 @@ const exampleOne = {
   },
   fallback_message: "This is a random fallback message"
 };
+
+// Usage
 
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleOne);
 
@@ -118,6 +120,7 @@ const exampleTwo = {
   fallback_message: "This is a random fallback message"
 };
 
+// Usage
 
 exceptionTransformer.generateErrorMessage(exampleTwo) // "All required questions must be answered." 
 ``` 
@@ -140,6 +143,8 @@ const exampleThree = {
   fallback_message: "This is a random fallback message"
 };
 
+// Usage
+
 exceptionTransformer.generateErrorMessage(exampleThree); // "phone_number: The phone number entered is not valid."
  ```
 </details>
@@ -160,7 +165,8 @@ const exampleFour = {
   fallback_message: "This is a random fallback message"
 };
 
----
+// Usage
+
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleFour);
 
 getFieldError("message") // ["body: Message body is missing"]
@@ -187,7 +193,9 @@ const exampleFive = {
   },
   fallback_message: "This is a random fallback message"
 };
----
+
+// Usage
+
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleFive);
 
 getFieldError("message") // ["Attachments or body must be provided."]
@@ -214,37 +222,37 @@ A Form that has a bulk creation section. Assume there is a form with an input `T
 
 ``` typescript
 const exampleSix = {
-    type: "ValidationError",
-    detail: {
-      title: ["Title is missing"],
-      questions: [{}, {}, {}, {answer: ["required"]}, {}]},
-    fallback_message: "This is a random fallback message"
+  type: "ValidationError",
+  detail: {
+    title: ["Title is missing"],
+    questions: [{}, {}, {}, {answer: ["required"]}, {}]},
+  fallback_message: "This is a random fallback message"
 };
 
----
+// Usage
 
 exceptionTransformer.generateErrorMessage({
- type: "CustomMessageError",
- detail: exampleSix.detail,
- fallback_message: ""
+  type: "CustomMessageError",
+  detail: exampleSix.detail,
+  fallback_message: ""
 }, {knownErrorKeys: ["questions"]}) // "title: Title is missing"
+
 exceptionTransformer.generateErrorMessage({
- type: "CustomMessageError",
- detail: exampleSix.detail,
- fallback_message: "" 
+  type: "CustomMessageError",
+  detail: exampleSix.detail,
+  fallback_message: "" 
 }, {knownErrorKeys: ["title", "questions"]}) // ""
 
----
-- Displaying error message for `Questions` section:
+// Displaying error message for `Questions` section:
 
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleSix);
 
 getFieldError("questions"); // ["answer: required"]
 
 exceptionTransformer.generateErrorMessage({
- type: "CustomMessageError",
- detail: exampleSix.detail.questions,
- fallback_message: "" 
+  type: "CustomMessageError",
+  detail: exampleSix.detail.questions,
+  fallback_message: "" 
 }) // "answer: required"
 
 ```
@@ -258,12 +266,13 @@ A non-complete error message
 
 ``` typescript
 const exampleSeven = {
-    type: "ValidationError",
-    detail: {},
-    fallback_message: ""
-  };
+  type: "ValidationError",
+  detail: {},
+  fallback_message: ""
+};
 
----
+// Usage
+
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleSeven);
 
 getFieldError("questions") // undefined
@@ -280,7 +289,8 @@ An empty error message
 ``` typescript
 const exampleEight = {};
 
----
+// Usage
+
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleEight);
 
 getFieldError("questions") // undefined
@@ -294,14 +304,15 @@ exceptionTransformer.generateErrorMessage(exampleEight, {knownErrorKeys: ["quest
 
 ``` typescript
 const exampleNine = {
-    type: "ValidationError",
-    detail: {
-      questions: [],
-      title: ["Title is missing"]},
-    fallback_message: "This is a random fallback message"
+  type: "ValidationError",
+  detail: {
+    questions: [],
+    title: ["Title is missing"]},
+  fallback_message: "This is a random fallback message"
 };
 
----
+// Usage
+
 const getFieldError = exceptionTransformer.generateSpecificFieldError(exampleNine);
 
 getFieldError("questions") // []
