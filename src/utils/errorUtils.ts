@@ -1,4 +1,8 @@
-import { Exception, ExceptionDetail } from "../ExceptionTransformerModel";
+import {
+  Exception,
+  ExceptionDetail,
+  ExceptionDetailValue
+} from "../ExceptionTransformerModel";
 import {
   isArrayOfStrings,
   isArrayOfObjects,
@@ -23,20 +27,21 @@ function generateFieldErrorFromErrorDetail(
   fieldName: string,
   errorDetail: ExceptionDetail
 ) {
-  let fieldError: string[] | undefined;
-  //fieldName can be string only
-  if (typeof fieldName === "string") {
-    const errorValue = getValueFromPath(errorDetail, fieldName);
+  if (typeof fieldName !== "string") {
+    throw new Error("fieldName can be string only");
+  }
 
-    // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
-    if (errorValue) {
-      if (isArrayOfStrings(errorValue)) {
-        fieldError = errorValue;
-      } else {
-        fieldError = getStringMessage(errorValue)
-          ? [getStringMessage(errorValue)]
-          : undefined;
-      }
+  let fieldError: string[] | undefined;
+
+  const errorValue = getValueFromPath(errorDetail, fieldName);
+
+  // errorValue can be string[], ExceptionDetail[], ExceptionDetail or undefined
+  if (errorValue) {
+    if (isArrayOfStrings(errorValue)) {
+      fieldError = errorValue;
+    } else {
+      const stringMessage = getStringMessage(errorValue);
+      fieldError = stringMessage ? [stringMessage] : undefined;
     }
   }
 
@@ -44,7 +49,7 @@ function generateFieldErrorFromErrorDetail(
 }
 
 function getStringMessage(
-  errorDetailValue: string[] | ExceptionDetail[] | ExceptionDetail,
+  errorDetailValue: ExceptionDetailValue,
   key?: string
 ): string {
   let message = "";
@@ -94,18 +99,15 @@ function deleteProperty(exceptionDetail: ExceptionDetail, path: string) {
   const filteredObj = { ...exceptionDetail };
   const keys = path.split(".");
 
-  keys.reduce<undefined | string[] | ExceptionDetail | ExceptionDetail[]>(
-    (value, key, index) => {
-      if (value && !Array.isArray(value)) {
-        if (index === keys.length - 1) {
-          delete value[key];
-        }
-
-        return value[key];
+  keys.reduce<undefined | ExceptionDetailValue>((value, key, index) => {
+    if (value && !Array.isArray(value)) {
+      if (index === keys.length - 1) {
+        delete value[key];
       }
-    },
-    filteredObj
-  );
+
+      return value[key];
+    }
+  }, filteredObj);
 
   return filteredObj;
 }
@@ -126,9 +128,7 @@ function getValueFromPath(exceptionDetail: ExceptionDetail, path: string) {
   const filteredObj = { ...exceptionDetail };
   const keys = path.split(".");
 
-  return keys.reduce<
-    undefined | string[] | ExceptionDetail | ExceptionDetail[]
-  >((acc, key) => {
+  return keys.reduce<undefined | ExceptionDetailValue>((acc, key) => {
     return acc && !Array.isArray(acc) ? acc[key] : undefined;
   }, filteredObj);
 }
