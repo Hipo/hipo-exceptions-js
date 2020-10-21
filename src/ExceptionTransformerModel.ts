@@ -16,9 +16,12 @@ interface Exception {
   fallback_message: string;
 }
 
-type Options = {
+type ErrorMessageGeneratorOptions = {
   knownErrorKeys?: string[] | null;
   skipTypes?: string[];
+  shouldHideErrorKey?: boolean;
+  shouldCapitalizeErrorKey?: boolean;
+  fieldLabelMap?: { [key: string]: string };
 };
 
 type OnUnexpectedException = (details: {
@@ -32,7 +35,7 @@ export {
   CustomTransformers,
   ExceptionDetail,
   Exception,
-  Options,
+  ErrorMessageGeneratorOptions,
   OnUnexpectedException,
   ExceptionDetailValue
 };
