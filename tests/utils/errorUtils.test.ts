@@ -212,6 +212,16 @@ describe("getStringMessage", () => {
       );
     });
 
+    it("should both replace key and capitalize when options are given", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        fieldLabelMap: {
+          phone_number: "tel_no"
+        },
+        shouldCapitalizeErrorKey: true
+      });
+      expect(message).toBe("Tel No: The phone number entered is not valid.");
+    });
+
     it("should return first non empty object's string with given custom key", () => {
       const message = getStringMessage(mockErrorDetail, {
         customKey: "My Error"

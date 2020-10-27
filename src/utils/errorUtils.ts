@@ -125,7 +125,9 @@ function getErrorKeyForStringMessageGenerator(
     errorKey = keyOptions?.customKey;
   } else if (keyOptions?.fieldLabelMap?.[defaultErrorKey]) {
     errorKey = keyOptions.fieldLabelMap[defaultErrorKey];
-  } else if (keyOptions?.shouldCapitalizeErrorKey) {
+  }
+
+  if (errorKey && keyOptions?.shouldCapitalizeErrorKey) {
     errorKey = convertSnakeCaseToTitleCase(errorKey);
   }
 
