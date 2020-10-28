@@ -8,6 +8,7 @@ import {
   isArrayOfObjects,
   isObjectEmpty
 } from "./dataStructureUtils";
+import { convertSnakeCaseToTitleCase } from "./stringUtils";
 
 function getErrorDetail(
   errorInfo: Exception | null | undefined
@@ -48,16 +49,26 @@ function generateFieldErrorFromErrorDetail(
   return fieldError;
 }
 
+interface StringMessageGeneratorKeyOptions {
+  customKey?: string;
+  shouldCapitalizeErrorKey?: boolean;
+  shouldHideErrorKey?: boolean;
+  fieldLabelMap?: { [key: string]: string };
+}
+
 function getStringMessage(
   errorDetailValue: ExceptionDetailValue,
-  key?: string
+  keyOptions?: StringMessageGeneratorKeyOptions
 ): string {
   let message = "";
 
   if (Array.isArray(errorDetailValue)) {
     if (isArrayOfStrings(errorDetailValue)) {
       // errorDetailValue = ["", ""]
-      message = generateMessageFromStringArray(errorDetailValue, key);
+      message = generateMessageFromStringArray(
+        errorDetailValue,
+        keyOptions?.customKey
+      );
     } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
@@ -65,7 +76,7 @@ function getStringMessage(
       );
 
       if (firstNonEmptyErrorObject) {
-        message = getStringMessage(firstNonEmptyErrorObject);
+        message = getStringMessage(firstNonEmptyErrorObject, keyOptions);
       }
     }
   } else if (typeof errorDetailValue === "object") {
@@ -78,13 +89,20 @@ function getStringMessage(
         errorDetailKeys.includes("non_field_errors") &&
         errorDetailValue.non_field_errors
       ) {
-        message = getStringMessage(errorDetailValue.non_field_errors);
-      } else {
-        // Generate message from the immediately found field error
         message = getStringMessage(
-          errorDetailValue[errorDetailKeys[0]],
-          errorDetailKeys[0]
+          errorDetailValue.non_field_errors,
+          keyOptions
         );
+      } else {
+        const defaultErrorKey = errorDetailKeys[0];
+
+        // Generate message from the immediately found field error
+        message = getStringMessage(errorDetailValue[defaultErrorKey], {
+          customKey: getErrorKeyForStringMessageGenerator(
+            defaultErrorKey,
+            keyOptions
+          )
+        });
       }
     }
   } else {
@@ -93,6 +111,27 @@ function getStringMessage(
   }
 
   return message;
+}
+
+function getErrorKeyForStringMessageGenerator(
+  defaultErrorKey: string,
+  keyOptions: StringMessageGeneratorKeyOptions | undefined
+) {
+  let errorKey: string | undefined = defaultErrorKey;
+
+  if (keyOptions?.shouldHideErrorKey) {
+    errorKey = undefined;
+  } else if (keyOptions?.customKey) {
+    errorKey = keyOptions?.customKey;
+  } else if (keyOptions?.fieldLabelMap?.[defaultErrorKey]) {
+    errorKey = keyOptions.fieldLabelMap[defaultErrorKey];
+  }
+
+  if (errorKey && keyOptions?.shouldCapitalizeErrorKey) {
+    errorKey = convertSnakeCaseToTitleCase(errorKey);
+  }
+
+  return errorKey;
 }
 
 function deleteProperty(exceptionDetail: ExceptionDetail, path: string) {

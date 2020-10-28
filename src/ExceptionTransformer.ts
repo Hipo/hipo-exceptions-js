@@ -9,7 +9,7 @@ import {
   CustomTransformers,
   Exception,
   ExceptionMap,
-  Options,
+  ErrorMessageGeneratorOptions,
   OnUnexpectedException
 } from "./ExceptionTransformerModel";
 
@@ -119,6 +119,9 @@ class ExceptionTransformer {
    *   `options`:
    *            `skipTypes`: (array of strings) Error types to be skipped.
    *             `knownErrorKeys`: (array of strings) Error keys to be skipped inside `Exception["detail"]`.
+   *             `shouldHideErrorKey`: (boolean) If true, error key won't be added to generated message`.
+   *             `shouldCapitalizeErrorKey`: (boolean) If true, converts error key from "snake_case" to "Title Case" in generated message`.
+   *             `fieldLabelMap`: (object) Mapping object for replacing backend error key with custom labels`.
    *
    *   Returns "";  when all error keys in errorInfo.detail are known (that is they are included in `knownErrorKeys`) or errorInfo.type should skipped.
    *   Returns first meaningful string found in non_field_errors, if it exists.
@@ -126,22 +129,35 @@ class ExceptionTransformer {
    *   Returns fallback_message; when it couldn't generate any meaningful message using the methods above.
    *   Returns genericErrorMessage; when there is no fallback_message
    */
-  generateErrorMessage(errorInfo: Exception, options: Options = {}): string {
-    const { knownErrorKeys = [], skipTypes = [] } = options;
+  generateErrorMessage(
+    errorInfo: Exception,
+    options: ErrorMessageGeneratorOptions = {}
+  ): string {
+    const {
+      knownErrorKeys = [],
+      skipTypes = [],
+      shouldHideErrorKey = false,
+      shouldCapitalizeErrorKey = true,
+      fieldLabelMap = {}
+    } = options;
     const shouldSkipError = skipTypes && skipTypes.includes(errorInfo.type);
     let finalMessage = "";
 
     try {
       if (!shouldSkipError) {
         const errorDetail = getErrorDetail(errorInfo);
-        let message = "";
 
         if (errorDetail && !isObjectEmpty(errorDetail)) {
-          message = getStringMessage(
-            removeKnownKeysFromErrorDetail(errorDetail, knownErrorKeys)
+          finalMessage = getStringMessage(
+            removeKnownKeysFromErrorDetail(errorDetail, knownErrorKeys),
+            {
+              shouldHideErrorKey,
+              shouldCapitalizeErrorKey,
+              fieldLabelMap
+            }
           );
         } else {
-          message = errorInfo.fallback_message || this.genericErrorMessage;
+          finalMessage = errorInfo.fallback_message || this.genericErrorMessage;
 
           // call `onUnexpectedException` if it fell to the fallback message
           if (this.onUnexpectedException) {
@@ -152,8 +168,6 @@ class ExceptionTransformer {
             });
           }
         }
-
-        finalMessage = message;
       }
     } catch (error) {
       // log this if `onUnexpectedException` is provided

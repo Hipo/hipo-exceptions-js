@@ -191,11 +191,64 @@ describe("getStringMessage", () => {
       {
         phone_number: ["The phone number entered is not valid."]
       },
-      {}
+      {
+        address: ["This field is required."]
+      }
     ];
 
     it("should return first non empty object's string", () => {
       const message = getStringMessage(mockErrorDetail);
+      expect(message).toBe(
+        "phone_number: The phone number entered is not valid."
+      );
+    });
+
+    it("should return first non empty object's string with beautified key when given option", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        shouldCapitalizeErrorKey: true
+      });
+      expect(message).toBe(
+        "Phone Number: The phone number entered is not valid."
+      );
+    });
+
+    it("should both replace key and capitalize when options are given", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        fieldLabelMap: {
+          phone_number: "tel_no"
+        },
+        shouldCapitalizeErrorKey: true
+      });
+      expect(message).toBe("Tel No: The phone number entered is not valid.");
+    });
+
+    it("should return first non empty object's string with given custom key", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        customKey: "My Error"
+      });
+      expect(message).toBe("My Error: The phone number entered is not valid.");
+    });
+
+    it("should not display error key in message when shouldHideErrorKey is true", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        shouldHideErrorKey: true
+      });
+      expect(message).toBe("The phone number entered is not valid.");
+    });
+
+    it("should replace error key using fieldLabelMap", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        fieldLabelMap: { phone_number: "Custom Title" }
+      });
+      expect(message).toBe(
+        "Custom Title: The phone number entered is not valid."
+      );
+    });
+
+    it("should not replace error key if no matching value in fieldLabelMap", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        fieldLabelMap: { address: "Custom Title" }
+      });
       expect(message).toBe(
         "phone_number: The phone number entered is not valid."
       );
@@ -245,7 +298,7 @@ describe("getStringMessage", () => {
 
     it("should add given key to the message and return", () => {
       const key = "Title";
-      const message = getStringMessage(mockErrorDetail, key);
+      const message = getStringMessage(mockErrorDetail, { customKey: key });
       expect(message).toBe(`${key}: ${mockErrorDetail[0]}`);
     });
   });
