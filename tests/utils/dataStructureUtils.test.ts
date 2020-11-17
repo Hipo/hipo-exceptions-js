@@ -65,7 +65,7 @@ describe("createMapFromObject", () => {
           {},
           {},
           {},
-          { phone_number: ["The phone number entered is not valid."] }
+          {phone_number: ["The phone number entered is not valid."]}
         ]
       },
       fallback_message: "This is a random fallback message"
@@ -80,7 +80,7 @@ describe("createMapFromObject", () => {
             {},
             {},
             {},
-            { phone_number: ["The phone number entered is not valid."] }
+            {phone_number: ["The phone number entered is not valid."]}
           ]
         }
       ],
@@ -179,7 +179,7 @@ describe("isArrayOfObjects", () => {
 
   it("should return true when given array of non empty object(s)", () => {
     const objectArrayResult = isArrayOfObjects([
-      { "key-string-1": "value-string-1" }
+      {"key-string-1": "value-string-1"}
     ]);
     const longObjectArrayResult = isArrayOfObjects([
       {
@@ -224,7 +224,7 @@ describe("isArrayOfObjects", () => {
     const arrayOfArraysAndObjectsResult = isArrayOfObjects([
       [],
       ["not", "empty", "array"],
-      { "object-key": "object-value" }
+      {"object-key": "object-value"}
     ]);
 
     expect(emptyArrayOfArrayResult).toBe(false);
@@ -259,6 +259,6 @@ describe("isObjectEmpty", () => {
   });
 
   it("should return false when object is not empty", () => {
-    expect(isObjectEmpty({ "any key": "any value" })).toBe(false);
+    expect(isObjectEmpty({"any key": "any value"})).toBe(false);
   });
 });

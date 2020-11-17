@@ -8,7 +8,7 @@ import {
   isArrayOfObjects,
   isObjectEmpty
 } from "./dataStructureUtils";
-import { convertSnakeCaseToTitleCase } from "./stringUtils";
+import {convertSnakeCaseToTitleCase} from "./stringUtils";
 
 function getErrorDetail(
   errorInfo: Exception | null | undefined
@@ -53,7 +53,7 @@ interface StringMessageGeneratorKeyOptions {
   customKey?: string;
   shouldCapitalizeErrorKey?: boolean;
   shouldHideErrorKey?: boolean;
-  fieldLabelMap?: { [key: string]: string };
+  fieldLabelMap?: {[key: string]: string};
 }
 
 function getStringMessage(
@@ -72,7 +72,7 @@ function getStringMessage(
     } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
       const firstNonEmptyErrorObject = (errorDetailValue as ExceptionDetail[]).find(
-        x => !isObjectEmpty(x)
+        (x) => !isObjectEmpty(x)
       );
 
       if (firstNonEmptyErrorObject) {
@@ -135,7 +135,7 @@ function getErrorKeyForStringMessageGenerator(
 }
 
 function deleteProperty(exceptionDetail: ExceptionDetail, path: string) {
-  const filteredObj = { ...exceptionDetail };
+  const filteredObj = {...exceptionDetail};
   const keys = path.split(".");
 
   keys.reduce<undefined | ExceptionDetailValue>((value, key, index) => {
@@ -164,7 +164,7 @@ function removeKnownKeysFromErrorDetail(
 }
 
 function getValueFromPath(exceptionDetail: ExceptionDetail, path: string) {
-  const filteredObj = { ...exceptionDetail };
+  const filteredObj = {...exceptionDetail};
   const keys = path.split(".");
 
   return keys.reduce<undefined | ExceptionDetailValue>((acc, key) => {

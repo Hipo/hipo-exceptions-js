@@ -1,27 +1,22 @@
-function createMapFromObject(obj: { [key: string]: any }) {
+function createMapFromObject(obj: {[key: string]: any}) {
   return new Map(Object.entries(obj));
 }
 
 function isArrayOfStrings(x: unknown): x is string[] {
-  return Array.isArray(x) && x.every(item => typeof item === "string");
+  return Array.isArray(x) && x.every((item) => typeof item === "string");
 }
 
-function isArrayOfObjects(x: unknown): x is Array<{ [key: string]: any }> {
+function isArrayOfObjects(x: unknown): x is Array<{[key: string]: any}> {
   return (
     Array.isArray(x) &&
-    x.every(item => typeof item === "object" && !Array.isArray(item))
+    x.every((item) => typeof item === "object" && !Array.isArray(item))
   );
 }
 
-function isObjectEmpty(obj: unknown): obj is {} {
+function isObjectEmpty(obj: unknown): obj is unknown {
   return typeof obj === "object" && !Array.isArray(obj) && obj
     ? Object.keys(obj).length === 0
     : false;
 }
 
-export {
-  createMapFromObject,
-  isArrayOfStrings,
-  isArrayOfObjects,
-  isObjectEmpty
-};
+export {createMapFromObject, isArrayOfStrings, isArrayOfObjects, isObjectEmpty};

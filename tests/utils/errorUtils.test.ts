@@ -38,8 +38,8 @@ describe("getErrorDetail", () => {
       type: "ValidationError",
       detail: {
         non_field_errors: [
-          { address: ["The address entered is not valid."] },
-          { phone_number: ["The phone number entered is not valid."] }
+          {address: ["The address entered is not valid."]},
+          {phone_number: ["The phone number entered is not valid."]}
         ]
       },
       fallback_message: "This is a random fallback message"
@@ -49,8 +49,8 @@ describe("getErrorDetail", () => {
 
     expect(detail).toStrictEqual({
       non_field_errors: [
-        { address: ["The address entered is not valid."] },
-        { phone_number: ["The phone number entered is not valid."] }
+        {address: ["The address entered is not valid."]},
+        {phone_number: ["The phone number entered is not valid."]}
       ]
     });
   });
@@ -62,8 +62,8 @@ describe("getErrorDetail", () => {
         non_field_errors: [
           {},
           {},
-          { address: ["The address entered is not valid."] },
-          { phone_number: ["The phone number entered is not valid."] }
+          {address: ["The address entered is not valid."]},
+          {phone_number: ["The phone number entered is not valid."]}
         ]
       },
       fallback_message: "This is a random fallback message"
@@ -87,8 +87,8 @@ describe("getErrorDetail", () => {
       non_field_errors: [
         {},
         {},
-        { address: ["The address entered is not valid."] },
-        { phone_number: ["The phone number entered is not valid."] }
+        {address: ["The address entered is not valid."]},
+        {phone_number: ["The phone number entered is not valid."]}
       ]
     });
     expect(detailWithOnlyEmptyObjects).toStrictEqual({
@@ -170,7 +170,7 @@ describe("generateMessageFromStringArray", () => {
 describe("generateFieldErrorFromErrorDetail", () => {
   const mockErrorDetail: ExceptionDetail = {
     title: ["Title is missing"],
-    questions: [{}, {}, {}, { answer: ["required"] }, {}]
+    questions: [{}, {}, {}, {answer: ["required"]}, {}]
   };
 
   it("should return correct field error", () => {
@@ -238,7 +238,7 @@ describe("getStringMessage", () => {
 
     it("should replace error key using fieldLabelMap", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: { phone_number: "Custom Title" }
+        fieldLabelMap: {phone_number: "Custom Title"}
       });
       expect(message).toBe(
         "Custom Title: The phone number entered is not valid."
@@ -247,7 +247,7 @@ describe("getStringMessage", () => {
 
     it("should not replace error key if no matching value in fieldLabelMap", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: { address: "Custom Title" }
+        fieldLabelMap: {address: "Custom Title"}
       });
       expect(message).toBe(
         "phone_number: The phone number entered is not valid."
@@ -258,7 +258,7 @@ describe("getStringMessage", () => {
   describe("when error detail is an object", () => {
     const mockErrorDetail: ExceptionDetailValue = {
       title: ["Title is missing"],
-      questions: [{}, {}, {}, { answer: ["required"] }, {}]
+      questions: [{}, {}, {}, {answer: ["required"]}, {}]
     };
 
     it("should return first field's error message", () => {
@@ -298,7 +298,7 @@ describe("getStringMessage", () => {
 
     it("should add given key to the message and return", () => {
       const key = "Title";
-      const message = getStringMessage(mockErrorDetail, { customKey: key });
+      const message = getStringMessage(mockErrorDetail, {customKey: key});
       expect(message).toBe(`${key}: ${mockErrorDetail[0]}`);
     });
   });
