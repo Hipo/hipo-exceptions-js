@@ -1,4 +1,4 @@
-type ExceptionMap = Map<string, object>;
+type ExceptionMap = Map<string, unknown>;
 
 interface ExceptionDetail {
   [key: string]: ExceptionDetailValue;
@@ -21,7 +21,7 @@ type ErrorMessageGeneratorOptions = {
   skipTypes?: string[];
   shouldHideErrorKey?: boolean;
   shouldCapitalizeErrorKey?: boolean;
-  fieldLabelMap?: { [key: string]: string };
+  fieldLabelMap?: {[key: string]: string};
 };
 
 type OnUnexpectedException = (details: {

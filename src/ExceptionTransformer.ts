@@ -1,4 +1,4 @@
-import { createMapFromObject, isObjectEmpty } from "./utils/dataStructureUtils";
+import {createMapFromObject, isObjectEmpty} from "./utils/dataStructureUtils";
 import {
   getErrorDetail,
   getStringMessage,
