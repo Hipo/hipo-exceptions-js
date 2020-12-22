@@ -27,7 +27,7 @@ function generateMessageFromStringArray(array: string[], key?: string): string {
 function generateFieldErrorFromErrorDetail(
   fieldName: string,
   errorDetail: ExceptionDetail
-) {
+): string[] | undefined {
   if (typeof fieldName !== "string") {
     throw new Error("fieldName can be string only");
   }
@@ -96,13 +96,22 @@ function getStringMessage(
       } else {
         const defaultErrorKey = errorDetailKeys[0];
 
-        // Generate message from the immediately found field error
-        message = getStringMessage(errorDetailValue[defaultErrorKey], {
-          customKey: getErrorKeyForStringMessageGenerator(
-            defaultErrorKey,
+        // If error detail is array of objects, it is a nested error, so
+        // generation should continue with the original key options
+        if (isArrayOfObjects(errorDetailValue[defaultErrorKey])) {
+          message = getStringMessage(
+            errorDetailValue[defaultErrorKey],
             keyOptions
-          )
-        });
+          );
+        } else {
+          message = getStringMessage(errorDetailValue[defaultErrorKey], {
+            // If not an array of objects, generate final error key using options
+            customKey: getErrorKeyForStringMessageGenerator(
+              defaultErrorKey,
+              keyOptions
+            )
+          });
+        }
       }
     }
   } else {

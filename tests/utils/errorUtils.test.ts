@@ -302,6 +302,39 @@ describe("getStringMessage", () => {
       expect(message).toBe(`${key}: ${mockErrorDetail[0]}`);
     });
   });
+
+  describe("when error detail is an object of an array of objects", () => {
+    const mockErrorDetail: ExceptionDetailValue = {
+      manual_part_process_quotes: [
+        {lead_time: ["Lead time is required."]},
+        {lead_time: ["Lead time is required."]}
+      ]
+    };
+
+    it("should return the first meaningful error", () => {
+      const message = getStringMessage(mockErrorDetail);
+
+      expect(message).toBe("lead_time: Lead time is required.");
+    });
+
+    it("should remove error key when `shouldHideErrorKey` is true", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        shouldHideErrorKey: true
+      });
+
+      expect(message).toBe("Lead time is required.");
+    });
+
+    it("should replace error key using given `fieldLabelMap`", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        fieldLabelMap: {
+          lead_time: "TIME"
+        }
+      });
+
+      expect(message).toBe("TIME: Lead time is required.");
+    });
+  });
 });
 
 describe("deleteProperty", () => {
