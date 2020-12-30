@@ -170,7 +170,8 @@ describe("generateMessageFromStringArray", () => {
 describe("generateFieldErrorFromErrorDetail", () => {
   const mockErrorDetail: ExceptionDetail = {
     title: ["Title is missing"],
-    questions: [{}, {}, {}, {answer: ["required"]}, {}]
+    questions: [{}, {}, {}, {answer: ["required"]}, {}],
+    additional_info: {name: ["This field is required"]}
   };
 
   it("should return correct field error", () => {
@@ -179,6 +180,22 @@ describe("generateFieldErrorFromErrorDetail", () => {
       mockErrorDetail
     );
     expect(fieldError).toBe(mockErrorDetail.title);
+  });
+
+  it("should return correct field error when field's value is not string[]", () => {
+    const fieldError = generateFieldErrorFromErrorDetail(
+      "questions",
+      mockErrorDetail
+    );
+    expect(fieldError).toStrictEqual(["answer: required"]);
+  });
+
+  it("should return correct field error when a more spesific field error is wanted", () => {
+    const fieldError = generateFieldErrorFromErrorDetail(
+      "additional_info.name",
+      mockErrorDetail
+    );
+    expect(fieldError).toStrictEqual(["This field is required"]);
   });
 });
 
@@ -205,7 +222,9 @@ describe("getStringMessage", () => {
 
     it("should return first non empty object's string with beautified key when given option", () => {
       const message = getStringMessage(mockErrorDetail, {
-        shouldCapitalizeErrorKey: true
+        keyOptions: {
+          shouldCapitalizeErrorKey: true
+        }
       });
       expect(message).toBe(
         "Phone Number: The phone number entered is not valid."
@@ -214,31 +233,26 @@ describe("getStringMessage", () => {
 
     it("should both replace key and capitalize when options are given", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: {
-          phone_number: "tel_no"
-        },
-        shouldCapitalizeErrorKey: true
+        keyOptions: {
+          fieldLabelMap: {
+            phone_number: "tel_no"
+          },
+          shouldCapitalizeErrorKey: true
+        }
       });
       expect(message).toBe("Tel No: The phone number entered is not valid.");
     });
 
-    it("should return first non empty object's string with given custom key", () => {
-      const message = getStringMessage(mockErrorDetail, {
-        customKey: "My Error"
-      });
-      expect(message).toBe("My Error: The phone number entered is not valid.");
-    });
-
     it("should not display error key in message when shouldHideErrorKey is true", () => {
       const message = getStringMessage(mockErrorDetail, {
-        shouldHideErrorKey: true
+        keyOptions: {shouldHideErrorKey: true}
       });
       expect(message).toBe("The phone number entered is not valid.");
     });
 
     it("should replace error key using fieldLabelMap", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: {phone_number: "Custom Title"}
+        keyOptions: {fieldLabelMap: {phone_number: "Custom Title"}}
       });
       expect(message).toBe(
         "Custom Title: The phone number entered is not valid."
@@ -247,7 +261,7 @@ describe("getStringMessage", () => {
 
     it("should not replace error key if no matching value in fieldLabelMap", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: {address: "Custom Title"}
+        keyOptions: {fieldLabelMap: {address: "Custom Title"}}
       });
       expect(message).toBe(
         "phone_number: The phone number entered is not valid."
@@ -263,6 +277,15 @@ describe("getStringMessage", () => {
 
     it("should return first field's error message", () => {
       const message = getStringMessage(mockErrorDetail);
+      expect(message).toBe("title: Title is missing");
+    });
+
+    it("should not get affected by `fieldLabelMap`", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        keyOptions: {
+          fieldLabelMap: {"": "Additional Documents"}
+        }
+      });
       expect(message).toBe("title: Title is missing");
     });
   });
@@ -283,6 +306,15 @@ describe("getStringMessage", () => {
       const message = getStringMessage(mockErrorDetail);
       expect(message).toBe("Attachments or body must be provided.");
     });
+
+    it("should return non-field error message with key given in `fieldLabelMap`", () => {
+      const message = getStringMessage(mockErrorDetail, {
+        keyOptions: {fieldLabelMap: {"": "Additional Documents"}}
+      });
+      expect(message).toBe(
+        "Additional Documents: Attachments or body must be provided."
+      );
+    });
   });
 
   describe("when error detail is an array of strings", () => {
@@ -297,9 +329,13 @@ describe("getStringMessage", () => {
     });
 
     it("should add given key to the message and return", () => {
-      const key = "Title";
-      const message = getStringMessage(mockErrorDetail, {customKey: key});
-      expect(message).toBe(`${key}: ${mockErrorDetail[0]}`);
+      const message = getStringMessage(mockErrorDetail, {
+        keyOptions: {
+          fieldLabelMap: {"": "title"},
+          shouldCapitalizeErrorKey: true
+        }
+      });
+      expect(message).toBe("Title: This field can't be missing");
     });
   });
 
@@ -319,7 +355,7 @@ describe("getStringMessage", () => {
 
     it("should remove error key when `shouldHideErrorKey` is true", () => {
       const message = getStringMessage(mockErrorDetail, {
-        shouldHideErrorKey: true
+        keyOptions: {shouldHideErrorKey: true}
       });
 
       expect(message).toBe("Lead time is required.");
@@ -327,8 +363,10 @@ describe("getStringMessage", () => {
 
     it("should replace error key using given `fieldLabelMap`", () => {
       const message = getStringMessage(mockErrorDetail, {
-        fieldLabelMap: {
-          lead_time: "TIME"
+        keyOptions: {
+          fieldLabelMap: {
+            lead_time: "TIME"
+          }
         }
       });
 
