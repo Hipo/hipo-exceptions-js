@@ -50,7 +50,6 @@ function generateFieldErrorFromErrorDetail(
 }
 
 interface StringMessageGeneratorKeyOptions {
-  customKey?: string;
   shouldCapitalizeErrorKey?: boolean;
   shouldHideErrorKey?: boolean;
   fieldLabelMap?: {[key: string]: string};
@@ -58,16 +57,17 @@ interface StringMessageGeneratorKeyOptions {
 
 function getStringMessage(
   errorDetailValue: ExceptionDetailValue,
-  keyOptions?: StringMessageGeneratorKeyOptions
+  options?: {key?: string; keyOptions?: StringMessageGeneratorKeyOptions}
 ): string {
   let message = "";
 
   if (Array.isArray(errorDetailValue)) {
     if (isArrayOfStrings(errorDetailValue)) {
+      // This is the exit condition of this recursion, string message can be generated now
       // errorDetailValue = ["", ""]
       message = generateMessageFromStringArray(
         errorDetailValue,
-        keyOptions?.customKey
+        generateErrorKeyToDisplay(options?.key || "", options?.keyOptions)
       );
     } else if (isArrayOfObjects(errorDetailValue)) {
       // errorDetailValue = [ {}, {}, {..} ]
@@ -76,7 +76,9 @@ function getStringMessage(
       );
 
       if (firstNonEmptyErrorObject) {
-        message = getStringMessage(firstNonEmptyErrorObject, keyOptions);
+        message = getStringMessage(firstNonEmptyErrorObject, {
+          keyOptions: options?.keyOptions
+        });
       }
     }
   } else if (typeof errorDetailValue === "object") {
@@ -89,29 +91,19 @@ function getStringMessage(
         errorDetailKeys.includes("non_field_errors") &&
         errorDetailValue.non_field_errors
       ) {
-        message = getStringMessage(
-          errorDetailValue.non_field_errors,
-          keyOptions
-        );
+        message = getStringMessage(errorDetailValue.non_field_errors, {
+          keyOptions: options?.keyOptions
+        });
       } else {
         const defaultErrorKey = errorDetailKeys[0];
 
-        // If error detail is array of objects, it is a nested error, so
-        // generation should continue with the original key options
-        if (isArrayOfObjects(errorDetailValue[defaultErrorKey])) {
-          message = getStringMessage(
-            errorDetailValue[defaultErrorKey],
-            keyOptions
-          );
-        } else {
-          message = getStringMessage(errorDetailValue[defaultErrorKey], {
-            // If not an array of objects, generate final error key using options
-            customKey: getErrorKeyForStringMessageGenerator(
-              defaultErrorKey,
-              keyOptions
-            )
-          });
-        }
+        // Start recursion again with the first key's value
+        // `key` should be sent in case `errorDetailValue[defaultErrorKey]` is the recursion's exit value: string[]
+        // `key` then can be processed according to `keyOptions`
+        message = getStringMessage(errorDetailValue[defaultErrorKey], {
+          key: defaultErrorKey,
+          keyOptions: options?.keyOptions
+        });
       }
     }
   } else {
@@ -122,16 +114,14 @@ function getStringMessage(
   return message;
 }
 
-function getErrorKeyForStringMessageGenerator(
+function generateErrorKeyToDisplay(
   defaultErrorKey: string,
   keyOptions: StringMessageGeneratorKeyOptions | undefined
-) {
+): string | undefined {
   let errorKey: string | undefined = defaultErrorKey;
 
   if (keyOptions?.shouldHideErrorKey) {
     errorKey = undefined;
-  } else if (keyOptions?.customKey) {
-    errorKey = keyOptions?.customKey;
   } else if (keyOptions?.fieldLabelMap?.[defaultErrorKey]) {
     errorKey = keyOptions.fieldLabelMap[defaultErrorKey];
   }

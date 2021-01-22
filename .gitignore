@@ -16,3 +16,5 @@ npm-debug.log
 
 # We gitignore the `/lib` but whitelist it at files property at package.json
 /lib
+
+.history

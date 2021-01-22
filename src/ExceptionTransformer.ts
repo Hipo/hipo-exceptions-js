@@ -151,9 +151,11 @@ class ExceptionTransformer {
           finalMessage = getStringMessage(
             removeKnownKeysFromErrorDetail(errorDetail, knownErrorKeys),
             {
-              shouldHideErrorKey,
-              shouldCapitalizeErrorKey,
-              fieldLabelMap
+              keyOptions: {
+                shouldHideErrorKey,
+                shouldCapitalizeErrorKey,
+                fieldLabelMap
+              }
             }
           );
         } else {
