@@ -98,8 +98,8 @@ function getStringMessage(
         const defaultErrorKey = errorDetailKeys[0];
 
         // Start recursion again with the first key's value
-        // `key` should be sent in case `errorDetailValue[defaultErrorKey]` is this recursion's exit value: string[]
-        // `key` then can be processes according to `keyOptions`
+        // `key` should be sent in case `errorDetailValue[defaultErrorKey]` is the recursion's exit value: string[]
+        // `key` then can be processed according to `keyOptions`
         message = getStringMessage(errorDetailValue[defaultErrorKey], {
           key: defaultErrorKey,
           keyOptions: options?.keyOptions
