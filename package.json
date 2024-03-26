@@ -1,6 +1,6 @@
 {
   "name": "@hipo/hipo-exceptions-js",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "JavaScript client for parsing the hipo-drf-exceptions",
   "main": "lib/index.js",
   "files": [
@@ -15,17 +15,17 @@
     "type-check": "echo \"type-checking...\" && tsc --noEmit"
   },
   "keywords": [
-    "hipo-exceptions-js",
+    "bakers-exceptions-js",
     "error",
     "exception",
-    "hipo"
+    "studiobakers"
   ],
-  "author": "Hipo Web Team",
+  "author": "Bakers Web Team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Hipo/hipo-exceptions-js/issues"
+    "url": "https://github.com/studiobakers/bakers-exceptions-js/issues"
   },
-  "homepage": "https://github.com/Hipo/hipo-exceptions-js#readme",
+  "homepage": "https://github.com/studiobakers/bakers-exceptions-js",
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "eslint"
